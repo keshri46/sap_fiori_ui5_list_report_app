@@ -1,0 +1,56 @@
+<core:FragmentDefinition xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<Menu itemSelected="onItemSelected" closed="onClosed" id="columnmenu">
+		<MenuItemGroup itemSelectionMode="MultiSelect" id="colmenuitemgroup">
+			<items>
+				<MenuItem text="Order Id" id="orderiditem" icon="sap-icon://add-coursebook" >
+					<customData>
+						<core:CustomData key="OrderID"/>
+					</customData>
+				</MenuItem>
+				<MenuItem text="Customer ID" id="customeriditem" icon="sap-icon://add-coursebook">
+					<customData>
+						<core:CustomData key="CustomerID"/>
+					</customData>
+				</MenuItem>
+				<MenuItem text="Order Date" id="orderdateitem" icon="sap-icon://add-coursebook">
+					<customData>
+						<core:CustomData key="OrderDate"/>
+					</customData>
+				</MenuItem>
+				<MenuItem text="Ship Via" id="shipviaitem" icon="sap-icon://add-coursebook">
+					<customData>
+						<core:CustomData key="ShipVia"/>
+					</customData>
+				</MenuItem>
+				<MenuItem text="Ship Name" id="shipnameitem" icon="sap-icon://add-coursebook">
+					<customData>
+						<core:CustomData key="ShipName"/>
+					</customData>
+				</MenuItem>
+				<MenuItem text="Ship Address" id="shipaddressitem" icon="sap-icon://add-coursebook">
+					<customData>
+						<core:CustomData key="ShipAddress"/>
+					</customData>
+				</MenuItem>
+				<MenuItem text="Ship City" id="shipcityitem" icon="sap-icon://add-coursebook">
+					<customData>
+						<core:CustomData key="ShipCity"/>
+					</customData>
+				</MenuItem>
+				<MenuItem text="Ship Country" id="shipcountryitem" icon="sap-icon://add-coursebook">
+					<customData>
+						<core:CustomData key="ShipCountry"/>
+					</customData>
+				</MenuItem>
+
+			</items>
+		</MenuItemGroup>
+		<MenuItemGroup itemSelectionMode="SingleSelect" id="selectallclearallgroup">
+			<items>
+				<MenuItem text="Select All" icon="sap-icon://multiselect-all" />
+				<MenuItem text="Clear All" icon="sap-icon://multiselect-none"/>
+			</items>
+		</MenuItemGroup>
+	</Menu>
+</core:FragmentDefinition>

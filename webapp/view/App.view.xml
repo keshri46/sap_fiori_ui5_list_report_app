@@ -1,0 +1,109 @@
+<mvc:View controllerName="zlistreport.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <App id="app">
+        <pages>
+            <Page id="page" title="{i18n>title}" showFooter="true">
+                <content>
+                    <VBox alignItems="End">
+                        <Button id="button" text="Columns" icon="sap-icon://add-filter" press="onPress" ariaHasPopup="Menu" />
+                    </VBox>
+                    <VBox>
+                        <Table id="idOrdersTable" growing="true" mode="SingleSelectLeft" alternateRowColors="true" growingScrollToLoad="true" sticky="ColumnHeaders,HeaderToolbar,InfoToolbar" inset="false" items="{OrdersModel>/}">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <Title id="tabTitle" text="{i18n>purOrder}" level="H2" />
+                                    <ToolbarSpacer />
+                                    <FlexBox renderType="Div">
+                                        <Button text="Add Order" icon="sap-icon://add-activity" type="Emphasized" class="sapUiSmallMarginEnd" press=".onAddNewOrder">
+                                            <layoutData>
+                                                <FlexItemData growFactor="2" />
+                                            </layoutData>
+                                        </Button>
+                                        <Input width="auto" class="sapUiSmallMarginEnd" placeholder="Enter Order Id" showSuggestion="true" showValueHelp="true" valueHelpRequest="" liveChange=".onSearchOrderLiveChange" suggestionItems="{/oData}">
+                                            <suggestionItems>
+                                                <core:Item text="{OrderID}" />
+                                            </suggestionItems>
+                                            <layoutData>
+                                                <FlexItemData growFactor="2" />
+                                            </layoutData>
+                                        </Input>
+                                        <Input width="auto" class="sapUiSmallMarginEnd" placeholder="Enter Customer Id" showSuggestion="true" showValueHelp="true" valueHelpRequest="" liveChange=".onSearchCustomerLiveChange" suggestionItems="{/oData}">
+                                            <suggestionItems>
+                                                <core:Item text="{CustomerID}" />
+                                            </suggestionItems>
+                                            <layoutData>
+                                                <FlexItemData growFactor="2" />
+                                            </layoutData>
+                                        </Input>
+                                        <SearchField placeholder="Search" width="18em" class="sapUiSmallMarginEnd" search="searchOrder" liveChange="searchOrder">
+                                            <layoutData>
+                                                <FlexItemData growFactor="2" />
+                                            </layoutData>
+                                        </SearchField>
+                                    </FlexBox>
+                                </Toolbar>
+                            </headerToolbar>
+                            <infoToolbar>
+                                <OverflowToolbar>
+                                    <Label text="{i18n>POList}" />
+                                </OverflowToolbar>
+                            </infoToolbar>
+                            <columns>
+                                <Column width="10em" hAlign="Begin">
+                                    <Text text="{i18n>ordrId}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="{i18n>custId}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="{i18n>orderDate}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="{i18n>shipVia}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="{i18n>shipName}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="{i18n>shipAddress}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="{i18n>shipCity}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="{i18n>shipCountry}" />
+                                </Column>
+                                <Column hAlign="Begin">
+                                    <Text text="Delete" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem vAlign="Middle" press="open" type="Active">
+                                    <cells>
+                                        <Text text="{OrdersModel>OrderID}" />
+                                        <Text text="{OrdersModel>CustomerID}" />
+                                        <Text text="{path: 'OrdersModel>OrderDate',formatter: '.formatter.formatDate'}" />
+                                        <Text text="{OrdersModel>ShipVia}" />
+                                        <Text text="{OrdersModel>ShipName}" />
+                                        <Text text="{OrdersModel>ShipAddress}" />
+                                        <Text text="{OrdersModel>ShipCity}" />
+                                        <Text text="{OrdersModel>ShipCountry}" />
+                                        <Button icon="sap-icon://delete" press=".onDeleteOrder" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </VBox>
+                </content>
+                <footer >
+                    <Toolbar>
+                        <ToolbarSpacer ></ToolbarSpacer>
+                        <Button text="Save" id="saveOrders" icon="sap-icon://save" type="Emphasized" class="sapUiSmallMarginEnd" press=".onSaveClicked" enabled="false"></Button>
+                    </Toolbar>
+                </footer>
+            </Page>
+        </pages>
+    </App>
+</mvc:View>

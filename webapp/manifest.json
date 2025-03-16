@@ -1,0 +1,129 @@
+{
+    "_version": "1.65.0",
+    "sap.app": {
+        "id": "zlistreport",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "resources": "resources.json",
+        "sourceTemplate": {
+            "id": "@sap/generator-fiori:basic",
+            "version": "1.16.3",
+            "toolsId": "13de4520-d84b-4e2c-9c2a-fa1bb58bdb7a"
+        },
+        "dataSources": {
+            "mainService": {
+                "uri": "/v2/northwind/northwind.svc/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "localUri": "localService/metadata.xml",
+                    "odataVersion": "2.0"
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": false,
+        "dependencies": {
+            "minUI5Version": "1.132.1",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.ui.layout": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "zlistreport.i18n.i18n"
+                }
+            },
+            "": {
+                "dataSource": "mainService",
+                "preload": true,
+                "settings": {}
+            }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "controlAggregation": "pages",
+                "controlId": "app",
+                "transition": "slide",
+                "type": "View",
+                "viewType": "XML",
+                "path": "zlistreport.view",
+                "async": true,
+                "viewPath": "zlistreport.view"
+            },
+            "routes": [
+                {
+                    "name": "RouteApp",
+                    "pattern": ":?query:",
+                    "target": [
+                        "TargetApp"
+                    ]
+                },
+                {
+                    "name": "RouteDetails",
+                    "pattern": "RouteDetails/{ordrPath}/{ordrId}",
+                    "target": [
+                        "TargetDetails"
+                    ]
+                }
+            ],
+            "targets": {
+                "TargetApp": {
+                    "id": "App",
+                    "name": "App",
+                    "viewType": "XML",
+                    "viewPath": "zlistreport.view"
+                },
+                "TargetDetails": {
+                    "id": "Details",
+                    "viewType": "XML",
+                    "viewPath": "zlistreport.view",
+                    "name": "Details"
+                }
+            }
+        },
+        "rootView": {
+            "viewName": "zlistreport.view.App",
+            "type": "XML",
+            "id": "AppView"
+        }
+    }
+}

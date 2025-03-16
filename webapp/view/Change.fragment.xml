@@ -1,0 +1,123 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+>
+    <VBox class="sapUiSmallMargin">
+        <f:Form editable="true">
+            <f:title>
+                <core:Title text="Order ID : {oFormModel>OrderID}" />
+            </f:title>
+            <f:layout>
+                <f:ResponsiveGridLayout
+                    labelSpanXL="4"
+                    labelSpanL="3"
+                    labelSpanM="4"
+                    labelSpanS="12"
+                    adjustLabelSpan="false"
+                    emptySpanXL="0"
+                    emptySpanL="4"
+                    emptySpanM="0"
+                    emptySpanS="0"
+                    columnsXL="2"
+                    columnsL="1"
+                    columnsM="1"
+                    singleContainerFullSize="false"
+                />
+            </f:layout>
+            <f:formContainers>
+                <f:FormContainer title="Order Details">
+                    <f:formElements>
+                        <f:FormElement label="Customer ID">
+                            <f:fields>
+                                <Input value="{oFormModel>CustomerID}" />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Employee ID">
+                            <f:fields>
+                                <Input value="{oFormModel>EmployeeID}" />
+                                <!-- <Input value="{HouseNumber}">
+									<layoutData>
+										<l:GridData span="XL1 L2 M2 S4" />
+									</layoutData>
+								</Input> -->
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Order Date">
+                            <f:fields>
+                                <DatePicker
+                                    value="{oFormModel>OrderDate}"
+                                    displayFormat="dd-MM-yyyy"
+                                    valueFormat="yyyy-MM-dd"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Required Date">
+                            <f:fields>
+                                <DatePicker
+                                    value="{oFormModel>RequiredDate}"
+                                    displayFormat="dd-MM-yyyy"
+                                    valueFormat="yyyy-MM-dd"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Shipped Date">
+                            <f:fields>
+                                <DatePicker
+                                    value="{oFormModel>ShippedDate}"
+                                    displayFormat="dd-MM-yyyy"
+                                    valueFormat="yyyy-MM-dd"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Ship Via">
+                            <f:fields>
+                                <Input value="{oFormModel>ShipVia}" />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Freight">
+                            <f:fields>
+                                <Input value="{oFormModel>Freight}" />
+                            </f:fields>
+                        </f:FormElement>
+                    </f:formElements>
+                </f:FormContainer>
+                <f:FormContainer title="Shipment Details">
+                    <f:formElements>
+                        <f:FormElement label="Ship Name">
+                            <f:fields>
+                                <Input value="{oFormModel>ShipName}" />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Ship Address">
+                            <f:fields>
+                                <Input value="{oFormModel>ShipAddress}" />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Ship City">
+                            <f:fields>
+                                <Input value="{oFormModel>ShipCity}" />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Ship Region">
+                            <f:fields>
+                                <Input value="{oFormModel>ShipRegion}" />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Ship Postal Code">
+                            <f:fields>
+                                <Input value="{oFormModel>ShipPostalCode}" />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement label="Ship Country">
+                            <f:fields>
+                                <Input value="{oFormModel>ShipCountry}" />
+                            </f:fields>
+                        </f:FormElement>
+                    </f:formElements>
+                </f:FormContainer>
+            </f:formContainers>
+        </f:Form>
+    </VBox>
+</core:FragmentDefinition>

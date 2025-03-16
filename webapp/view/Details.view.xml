@@ -1,0 +1,41 @@
+<mvc:View
+    controllerName="zlistreport.controller.Details"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.m"
+>
+    <Page
+        id="detailpage"
+        title="{i18n>orderdetails}"
+        showNavButton="true"
+        navButtonPress="onNavToApp"
+        showHeader="true"
+        models="oFormModel"
+    >
+        <customHeader>
+            <Bar>
+                <contentRight>
+                    <Button
+                        id="edit"
+                        text="Edit"
+                        press="handleEditPress"
+                    />
+                    <Button
+                        id="save"
+                        text="Save"
+                        type="Emphasized"
+                        visible="false"
+                        press="handleSavePress"
+                    />
+                    <Button
+                        id="cancel"
+                        text="Cancel"
+                        visible="false"
+                        press="handleCancelPress"
+                    />
+                </contentRight>
+            </Bar>
+        </customHeader>
+    </Page>
+</mvc:View>
