@@ -7,10 +7,9 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
-    "sap/m/BusyDialog"
-
-
-], (Controller, JSONModel, Fragment, syncStyleClass, FilterOperator, Filter, MessageBox, MessageToast, BusyDialog) => {
+    "sap/m/BusyDialog",
+    "zlistreport/util/Formatter"
+], (Controller, JSONModel, Fragment, syncStyleClass, FilterOperator, Filter, MessageBox, MessageToast, BusyDialog, Formatter, ODataUtils) => {
     "use strict";
     var that, oView;
     return Controller.extend("zlistreport.controller.App", {
@@ -47,9 +46,11 @@ sap.ui.define([
             that.oRouter.getRoute("RouteApp").attachPatternMatched(that.onAppRouteMatched, that);
             // that.loadNorthwindData();
         },
-        onAppRouteMatched : function(){
+
+        onAppRouteMatched: function () {
             that.loadNorthwindData();
         },
+
         loadNorthwindData: function () {
             // debugger;
             var oModel = that.getOwnerComponent().getModel();
@@ -58,12 +59,12 @@ sap.ui.define([
             oBusyDialog.open();
             oModel.read(sPath, {
                 success: function (oData) {
-                    
+
                     let res = oData.results.map(function (val) {
                         val.OrderID = String(val.OrderID);
                         val.ShipVia = String(val.ShipVia);
                         val.EmployeeID = String(val.EmployeeID);
-                        // debugger;
+                        val.isNew = false;
                         return val;
                     });
                     oView.byId("tabTitle").setText(that.i18nBundle.getText("purOrder", res.length));
@@ -140,7 +141,6 @@ sap.ui.define([
             debugger;
         },
 
-
         onClosed: function (oEvt) {
             // debugger
         },
@@ -148,7 +148,7 @@ sap.ui.define([
         onPress: function () {
             // var oView = this.getView(),
             var oButton = oView.byId("button");
-        
+
             if (!this._oMenuFragment) {
                 this._oMenuFragment = Fragment.load({
                     id: oView.getId(),
@@ -288,57 +288,308 @@ sap.ui.define([
             oView.byId("idOrdersTable").getBinding("items").filter(oGlobalFilter);
 
         },
+
         onSearchCustomerLiveChange: function (oEvt) {
             var sQuery = oEvt.getParameter("newValue");
-            console.log("onSearchCustomerLiveChange query : "+sQuery);
-            
+            console.log("onSearchCustomerLiveChange query : " + sQuery);
+
             var oFilter = new Filter("CustomerID", FilterOperator.Contains, sQuery);
             oView.byId("idOrdersTable").getBinding("items").filter(oFilter);
 
         },
+
         onSearchOrderLiveChange: function (oEvt) {
             var sQuery = oEvt.getParameter("newValue");
-            console.log("onSearchOrderLiveChange query : "+sQuery);
-            
+            console.log("onSearchOrderLiveChange query : " + sQuery);
+
             var oFilter = new Filter("OrderID", FilterOperator.Contains, sQuery);
             oView.byId("idOrdersTable").getBinding("items").filter(oFilter);
 
         },
-        onAddNewOrder:function(oEvt){
-            console.log(oEvt.getSource());
+
+        onAddNewOrder: function (oEvt) {
+            // console.log(oEvt.getSource());
             oView.byId("saveOrders").setEnabled(true);
+
+            var oModel = this.getView().getModel("OrdersModel");
+            var aData = oModel.getProperty("/");  // Get the existing data
+            // console.log(aData);
+            // console.log(oModel);
+
+
+            const oNewRecord = structuredClone(aData[0]);
+            // console.log(oNewRecord);
+            oNewRecord.isNew = true;
+            oNewRecord.OrderID = "";
+            oNewRecord.CustomerID = "";
+            oNewRecord.ShipVia = "";
+            oNewRecord.ShipName = "";
+            oNewRecord.ShipAddress = "";
+            oNewRecord.ShipCity = "";
+            oNewRecord.ShipCountry = "";
+
+            var oDate = new Date();
+            console.log(typeof (oDate));
+            // var oFormattedDate = ODataUtils.formatValue(oDate, "Edm.DateTime");
+            console.log(typeof (oFormattedDate));
+
+
+            oNewRecord.OrderDate = new Date();
+
+            // Create a blank row with `isNew: true`
+            // var oNewRecord = {
+            // OrderID: "",
+            // CustomerID: "",
+            // OrderDate: "",
+            // ShipVia: "",
+            // ShipName: "",
+            // ShipAddress: "",
+            // ShipCity: "",
+            // ShipCountry: "",
+            //     isNew: true // Flag to identify new records
+            // };
+
+            // Add the new record at index 0
+            aData.unshift(oNewRecord);
+
+            // Update the model with new data
+            oModel.setProperty("/", aData);
+            oModel.refresh(true); // Force UI update
+            console.log("Updated Data:", oModel.getProperty("/"));
+
         },
-        onDeleteOrder:function name(oEvt) {
+
+        onDeleteOrderPress: function name(oEvent) {
+            console.log(oEvent.getSource());
+
+
+            var oView = this.getView();
+            var oModel = oView.getModel("OrdersModel"); // Local JSON model
+            var oODataModel = this.getOwnerComponent().getModel(); // OData model
+
+            var oItemContext = oEvent.getSource().getBindingContext("OrdersModel");
+
+            if (!oItemContext) {
+                MessageBox.error("Could not determine the selected order.");
+                return;
+            }
+
+            var sOrderId = oItemContext.getProperty("OrderID");
+
+            if (!sOrderId) {
+                MessageBox.error("Invalid Order ID. Cannot delete this record.");
+                return;
+            }
+
+            MessageBox.confirm("Are you sure you want to delete this order?", {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        // **Remove order from local UI model first**
+                        var aOrders = oModel.getProperty("/");
+                        var aUpdatedOrders = aOrders.filter(function (oOrder) {
+                            return oOrder.OrderID !== sOrderId;
+                        });
+
+                        oModel.setProperty("/", aUpdatedOrders);
+                        oModel.refresh();
+
+                        var oBusyDialog = new sap.m.BusyDialog();
+                        oBusyDialog.open();
+
+                        // Ensure batch mode is disabled
+                        oODataModel.setUseBatch(false);
+
+                        // **Backend delete request**
+                        var sPath = "/Orders(" + sOrderId + ")";
+
+                        oODataModel.remove(sPath, {
+                            success: function () {
+                                oBusyDialog.close();
+                                MessageToast.show("Order deleted successfully!");
+                            },
+                            error: function (oError) {
+                                oBusyDialog.close();
+                                console.error("Delete Error:", oError);
+                                MessageBox.error("Error : 403");
+                            }
+                        });
+                    }
+                }
+            });
+        },
+
+        onSaveClicked: function name(oEvt) {
             console.log(oEvt.getSource());
-            
+
+            var oView = this.getView();
+            var oOrdersModel = oView.getModel("OrdersModel");
+            var oDataModel = this.getOwnerComponent().getModel(); // Main ODataModel
+
+            var aData = oOrdersModel.getData();
+            var oNewOrder = aData[0];
+
+            delete oNewOrder.isNew;
+            console.log(oNewOrder);
+
+            // var oDataModel = this.getOwnerComponent().getModel();
+            // Gather data from inputs (ensure you have input fields bound in your view)
+            // var oNewOrder = {
+            //     CustomerID: this.byId("customerIdInput").getValue(),
+            //     EmployeeID: parseInt(this.byId("employeeIdInput").getValue(), 10),
+            //     OrderDate: this.byId("orderDateInput").getValue(), // ensure correct format
+            //  ... include additional properties as needed
+            // };
+
+            var oBusyDialog = new BusyDialog();
+            oBusyDialog.open();
+
+            // Ensure batch mode is disabled to avoid Content-ID error
+            oDataModel.setUseBatch(false);
+
+            oDataModel.create("/Orders", oNewOrder, {
+                success: function (oData) {
+                    oBusyDialog.close();
+                    MessageBox.show("Order created successfully.");
+                    console.log("Order created successfully. : ", oData);
+                },
+                error: function (oError) {
+                    oBusyDialog.close();
+                    MessageBox.error("Error creating order.");
+                    console.log("Error creating order. : ", oError);
+                }
+            });
         },
-        onSaveClicked:function name(oEvt) {
-            console.log(oEvt.getSource());
+
+        onUpdateOrderPress: function (oEvent) {
+
+            console.log(oEvent.getSource());
+
+            // Get the binding context for the selected row
+            var oContext = oEvent.getSource().getBindingContext("OrdersModel");
+            var sPath = oContext.getPath();
             
+            var oOrdersModel = this.getView().getModel("OrdersModel");
+            var oUpdatedData = oOrdersModel.getProperty(sPath);
+
+            oUpdatedData.isNew = true;
+
+        
+            oOrdersModel.refresh(true); // Force UI update
+
+            // Optionally, show a confirmation dialog before update
+            sap.m.MessageBox.confirm("Are you sure you want to update this order?", {
+                title: "Confirm Update",
+                onClose: function (oAction) {
+                    if (oAction === sap.m.MessageBox.Action.OK) {
+                        var oDataModel = this.getView().getModel();
+                        oDataModel.update(sPath, oUpdatedData, {
+                            success: function () {
+                                sap.m.MessageToast.show("Order updated successfully.");
+                            },
+                            error: function () {
+                                sap.m.MessageToast.show("Error updating order.");
+                            }
+                        });
+                    }
+                }.bind(this)
+            });
         },
+
+
         open: function (oEvt) {
             // debugger
             var sPath = oEvt.getSource().getBindingContextPath();
             var orderId = oView.getModel("OrdersModel").getProperty(sPath).OrderID;
-            sPath = sPath.replace('/','');
+            sPath = sPath.replace('/', '');
             console.log(orderId);
             console.log(sPath);
             debugger;
-            that.oRouter.navTo("RouteDetails",{
-                ordrPath : sPath,
-                ordrId : orderId
+            that.oRouter.navTo("RouteDetails", {
+                ordrPath: sPath,
+                ordrId: orderId
             });
         },
-        formatter: {
-            formatDate: function(oDate) {
-                if (oDate) {
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
-                        pattern: "dd-MM-yyyy"
-                    });
-                    return oDateFormat.format(new Date(oDate));
-                }
-                return "";
+
+        onValueHelpRequestOrder: function (oEvent) {
+            var sInputValue = oEvent.getSource().getValue(),
+                oView = this.getView();
+
+            if (!this._pValueHelpDialogOrder) {
+                this._pValueHelpDialogOrder = sap.ui.core.Fragment.load({
+                    id: oView.getId(),
+                    name: "zlistreport.view.ValueHelpDialog",
+                    controller: this
+                }).then(function (oDialog) {
+                    oView.addDependent(oDialog);
+                    return oDialog;
+                });
             }
+            this._pValueHelpDialogOrder.then(function (oDialog) {
+                // Create a filter for OrderID using the input value
+                var oFilter = new sap.ui.model.Filter("OrderID", sap.ui.model.FilterOperator.Contains, sInputValue);
+                oDialog.getBinding("items").filter([oFilter]);
+                // Open the dialog with the current input value as a parameter if needed
+                oDialog.open(sInputValue);
+            });
+        },
+
+        onValueHelpSearchOrder: function (oEvent) {
+            debugger;
+            var sValue = oEvent.getParameter("value");
+            var oFilter = new sap.ui.model.Filter("OrderID", sap.ui.model.FilterOperator.Contains, sValue);
+            oEvent.getSource().getBinding("items").filter([oFilter]);
+            //
+        },
+
+        onValueHelpCloseOrder: function (oEvent) {
+            var oSelectedItem = oEvent.getParameter("selectedItem");
+            // Clear filter after closing
+            oEvent.getSource().getBinding("items").filter([]);
+            if (!oSelectedItem) {
+                return;
+            }
+            // Set the selected OrderID value into the appropriate input field
+            this.byId("orderInput").setValue(oSelectedItem.getTitle());
+        },
+
+        onValueHelpRequestCustomer: function (oEvent) {
+            var sInputValue = oEvent.getSource().getValue(),
+                oView = this.getView();
+
+            if (!this._pValueHelpDialogCustomer) {
+                this._pValueHelpDialogCustomer = sap.ui.core.Fragment.load({
+                    id: oView.getId(),
+                    name: "zlistreport.view.ValueHelpDialogCustomer",
+                    controller: this
+                }).then(function (oDialog) {
+                    oView.addDependent(oDialog);
+                    return oDialog;
+                });
+            }
+            this._pValueHelpDialogCustomer.then(function (oDialog) {
+                // Create a filter for CustomerID using the input value
+                var oFilter = new sap.ui.model.Filter("CustomerID", sap.ui.model.FilterOperator.Contains, sInputValue);
+                oDialog.getBinding("items").filter([oFilter]);
+                oDialog.open(sInputValue);
+            });
+        },
+
+        onValueHelpSearchCustomer: function (oEvent) {
+            var sValue = oEvent.getParameter("value");
+            var oFilter = new sap.ui.model.Filter("CustomerID", sap.ui.model.FilterOperator.Contains, sValue);
+            oEvent.getSource().getBinding("items").filter([oFilter]);
+        },
+
+        onValueHelpCloseCustomer: function (oEvent) {
+            var oSelectedItem = oEvent.getParameter("selectedItem");
+            oEvent.getSource().getBinding("items").filter([]);
+            if (!oSelectedItem) {
+                return;
+            }
+            // Set the selected CustomerID value into the appropriate input field
+            this.byId("customerInput").setValue(oSelectedItem.getTitle());
         }
+
     });
 });

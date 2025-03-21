@@ -21,15 +21,15 @@
                                                 <FlexItemData growFactor="2" />
                                             </layoutData>
                                         </Button>
-                                        <Input width="auto" class="sapUiSmallMarginEnd" placeholder="Enter Order Id" showSuggestion="true" showValueHelp="true" valueHelpRequest="" liveChange=".onSearchOrderLiveChange" suggestionItems="{/oData}">
+                                        <Input id="orderInputId" width="auto" class="sapUiSmallMarginEnd" placeholder="Enter Order Id" showSuggestion="true" showValueHelp="true" valueHelpRequest="onValueHelpRequestOrder" liveChange=".onSearchOrderLiveChange" suggestionItems="{OrdersModel>/}">
                                             <suggestionItems>
-                                                <core:Item text="{OrderID}" />
+                                                <core:Item text="{OrdersModel>/OrderID}" />
                                             </suggestionItems>
                                             <layoutData>
                                                 <FlexItemData growFactor="2" />
                                             </layoutData>
                                         </Input>
-                                        <Input width="auto" class="sapUiSmallMarginEnd" placeholder="Enter Customer Id" showSuggestion="true" showValueHelp="true" valueHelpRequest="" liveChange=".onSearchCustomerLiveChange" suggestionItems="{/oData}">
+                                        <Input id="customerInputId" width="auto" class="sapUiSmallMarginEnd" placeholder="Enter Customer Id" showSuggestion="true" showValueHelp="true" valueHelpRequest="onValueHelpRequestCustomer" liveChange=".onSearchCustomerLiveChange" suggestionItems="{OrdersModel>/}">
                                             <suggestionItems>
                                                 <core:Item text="{CustomerID}" />
                                             </suggestionItems>
@@ -76,31 +76,34 @@
                                     <Text text="{i18n>shipCountry}" />
                                 </Column>
                                 <Column hAlign="Begin">
-                                    <Text text="Delete" />
+                                    <Text text="Actions" />
                                 </Column>
                             </columns>
                             <items>
                                 <ColumnListItem vAlign="Middle" press="open" type="Active">
                                     <cells>
-                                        <Text text="{OrdersModel>OrderID}" />
-                                        <Text text="{OrdersModel>CustomerID}" />
-                                        <Text text="{path: 'OrdersModel>OrderDate',formatter: '.formatter.formatDate'}" />
-                                        <Text text="{OrdersModel>ShipVia}" />
-                                        <Text text="{OrdersModel>ShipName}" />
-                                        <Text text="{OrdersModel>ShipAddress}" />
-                                        <Text text="{OrdersModel>ShipCity}" />
-                                        <Text text="{OrdersModel>ShipCountry}" />
-                                        <Button icon="sap-icon://delete" press=".onDeleteOrder" />
+                                        <Input value="{OrdersModel>OrderID}" editable="{OrdersModel>isNew}" placeholder="{i18n>ordrId}"/>
+                                        <Input value="{OrdersModel>CustomerID}" editable="{OrdersModel>isNew}" placeholder="{i18n>custId}"/>
+                                        <DatePicker value="{path: 'OrdersModel>OrderDate', formatter: '.Formatter.formatDate'}" editable="{OrdersModel>isNew}" />
+                                        <Input value="{OrdersModel>ShipVia}" editable="{OrdersModel>isNew}" placeholder="{i18n>shipVia}"/>
+                                        <Input value="{OrdersModel>ShipName}" editable="{OrdersModel>isNew}" placeholder="{i18n>shipName}"/>
+                                        <Input value="{OrdersModel>ShipAddress}" editable="{OrdersModel>isNew}" placeholder="{i18n>shipAddress}"/>
+                                        <Input value="{OrdersModel>ShipCity}" editable="{OrdersModel>isNew}" placeholder="{i18n>shipCity}"/>
+                                        <Input value="{OrdersModel>ShipCountry}" editable="{OrdersModel>isNew}" placeholder="{i18n>shipCountry}"/>
+                                        <HBox>
+                                            <Button type="Accept" class="sapUiSmallMarginEnd" icon="sap-icon://edit" press=".onUpdateOrderPress" />
+                                            <Button type="Reject" class="sapUiSmallMarginEnd" icon="sap-icon://delete" press=".onDeleteOrderPress" />
+                                        </HBox>
                                     </cells>
                                 </ColumnListItem>
                             </items>
                         </Table>
                     </VBox>
                 </content>
-                <footer >
+                <footer>
                     <Toolbar>
-                        <ToolbarSpacer ></ToolbarSpacer>
-                        <Button text="Save" id="saveOrders" icon="sap-icon://save" type="Emphasized" class="sapUiSmallMarginEnd" press=".onSaveClicked" enabled="false"></Button>
+                        <ToolbarSpacer />
+                        <Button text="Save" id="saveOrders" icon="sap-icon://save" type="Emphasized" class="sapUiSmallMarginEnd" press=".onSaveClicked" enabled="false" />
                     </Toolbar>
                 </footer>
             </Page>

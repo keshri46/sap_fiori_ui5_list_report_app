@@ -1,0 +1,22 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <SelectDialog
+        id="selectDialogCustomer"
+        title="Select Customer"
+        items="{OrdersModel>/}"
+        search=".onValueHelpSearchCustomer"
+        confirm=".onValueHelpCloseCustomer"
+        cancel=".onValueHelpCloseCustomer"
+    >
+        <StandardListItem
+            iconDensityAware="false"
+            iconInset="false"
+			icon="sap-icon://person-placeholder"
+			adaptTitleSize="true"
+            title="{i18n>custId} : {OrdersModel>CustomerID}"
+            description="{i18n>ordrId} : {OrdersModel>OrderID}"
+        />
+    </SelectDialog>
+</core:FragmentDefinition>
